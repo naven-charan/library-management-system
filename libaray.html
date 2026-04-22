@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System - Navigation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 🎨 UI Design Colors & Variables */
+        :root {
+            --bg-outer: #EAE3DA;      
+            --bg-inner: #FBF8F1;      
+            --text-main: #5C544D;     
+            --text-light: #9B948E;    
+            --accent-purple: #8C82B5; 
+            --accent-green: #8BB88B;  
+            --accent-red: #E27B7B;    
+            --gradient-btn: linear-gradient(135deg, #8C82B5 0%, #E2A27B 100%);
+            
+            --shadow-soft: 0 10px 30px rgba(92, 84, 77, 0.08);
+            --shadow-hover: 0 15px 35px rgba(92, 84, 77, 0.15);
+            
+            --radius-lg: 30px;
+            --radius-md: 16px;
+            --radius-pill: 50px;
+            
+            --bezier-smooth: cubic-bezier(0.2, 0.8, 0.2, 1);
+            --transition-smooth: all 0.5s var(--bezier-smooth);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { background-color: var(--bg-outer); color: var(--text-main); overflow-x: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; }
+
+        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleFadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        .fade-transition { transition: opacity 0.6s var(--bezier-smooth), transform 0.6s var(--bezier-smooth); }
+        .hidden { display: none !important; }
+
+        /* 🔐 1. Login Page */
+        #login-page { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 10; }
+        .login-card { background: var(--bg-inner); padding: 50px 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); width: 100%; max-width: 420px; text-align: center; }
+        .login-card h2 { color: var(--text-main); margin-bottom: 30px; font-weight: 700; font-size: 24px;}
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: var(--text-light); padding-left: 15px;}
+        .form-group input, .form-group select { width: 100%; padding: 15px 25px; background: #F0ECE4; border: 2px solid transparent; border-radius: var(--radius-pill); font-size: 14px; color: var(--text-main); transition: var(--transition-smooth); }
+        .form-group input:focus, .form-group select:focus { background: white; border-color: var(--accent-purple); outline: none; box-shadow: 0 0 0 4px rgba(140, 130, 181, 0.1); }
+        .btn { padding: 15px 30px; border: none; border-radius: var(--radius-pill); cursor: pointer; font-weight: 600; font-size: 15px; color: white; transition: var(--transition-smooth); display: inline-block; }
+        .btn:active { transform: scale(0.95); }
+        .btn-gradient { background: var(--gradient-btn); box-shadow: 0 4px 15px rgba(226, 162, 123, 0.3); width: 100%; margin-top: 10px; background-size: 150% auto; transition: 0.5s; }
+        .btn-gradient:hover { background-position: right center; box-shadow: 0 8px 25px rgba(226, 162, 123, 0.5); transform: translateY(-2px); }
+        
+        /* Table Action Buttons */
+        .btn-action-primary { background: var(--accent-purple); padding: 8px 16px; font-size: 12px; border-radius: 8px;}
+        .btn-action-primary:hover { background: #7A70A3; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(140, 130, 181, 0.3);}
+        .btn-action-secondary { background: #E0DFDD; color: var(--text-main); padding: 8px 16px; font-size: 12px; border-radius: 8px;}
+        .btn-action-secondary:hover { background: #D1D0CE; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(92, 84, 77, 0.1);}
+        .btn-action-danger { background: rgba(226, 123, 123, 0.15); color: #C25A5A; padding: 8px 16px; font-size: 12px; border-radius: 8px;}
+        .btn-action-danger:hover { background: var(--accent-red); color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(226, 123, 123, 0.3);}
+        .action-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        /* 🏠 2. Dashboard Layout */
+        #dashboard-page { position: absolute; width: 96vw; height: 94vh; background: var(--bg-inner); border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); display: flex; flex-direction: column; overflow: hidden; opacity: 0; transform: translateY(40px) scale(0.97); pointer-events: none; }
+        .app-body { display: flex; flex: 1; overflow: hidden; }
+        
+        /* 📋 Sidebar */
+        .sidebar { width: 100px; background: transparent; display: flex; flex-direction: column; align-items: center; padding: 30px 0; border-right: 2px solid rgba(0,0,0,0.03); z-index: 5; }
+        .sidebar-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; cursor: pointer; font-size: 20px; background: #F0ECE4; color: var(--text-light); transition: var(--transition-smooth); opacity: 0; }
+        .sidebar-icon:hover { background: white; box-shadow: var(--shadow-soft); transform: scale(1.15); color: var(--accent-purple); }
+        .sidebar-icon.active { background: white; box-shadow: var(--shadow-soft); color: var(--accent-purple); border: 2px solid var(--accent-purple);}
+        .sidebar-icon.logout { margin-top: auto; background: rgba(226, 123, 123, 0.1); color: var(--accent-red); }
+        .sidebar-icon.logout:hover { background: var(--accent-red); color: white; }
+
+        .main-content { flex: 1; padding: 40px 50px; overflow-y: auto; position: relative; }
+        
+        /* 🔄 Views */
+        .view-section { opacity: 1; transition: opacity 0.4s ease; }
+        
+        /* 🔍 Search Header */
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; opacity: 0; }
+        .search-container { display: flex; align-items: center; background: white; border-radius: var(--radius-pill); padding: 5px 5px 5px 25px; box-shadow: var(--shadow-soft); width: 40%; transition: var(--transition-smooth); border: 2px solid transparent; }
+        .search-container:focus-within { border-color: rgba(140, 130, 181, 0.3); transform: translateY(-2px); box-shadow: var(--shadow-hover); width: 55%; }
+        .search-input { border: none; outline: none; flex: 1; font-size: 15px; color: var(--text-main); background: transparent;}
+        .search-btn { background: var(--gradient-btn); color: white; border: none; padding: 12px 30px; border-radius: var(--radius-pill); cursor: pointer; font-weight: 600; transition: var(--transition-smooth);}
+        .search-btn:hover { transform: scale(1.05); }
+
+        .header-actions { display: flex; align-items: center; gap: 20px; }
+        #add-book-btn { display: none; background: var(--accent-green); padding: 10px 20px; font-size: 13px; }
+        #add-book-btn:hover { background: #75A375; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(139, 184, 139, 0.4);}
+        .user-profile { display: flex; align-items: center; gap: 15px; font-weight: 600; cursor: pointer; transition: var(--transition-smooth);}
+        .user-profile:hover { transform: translateX(-5px); }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--accent-purple); color: white; display: flex; justify-content: center; align-items: center; font-size: 18px; box-shadow: 0 4px 10px rgba(140, 130, 181, 0.3);}
+
+        /* 📚 Dashboard / Generic UI */
+        .section-header { opacity: 0; }
+        h3.section-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; color: var(--text-main); }
+        
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); }
+        .empty-state h2 { font-size: 24px; color: var(--text-main); margin-bottom: 10px; }
+        
+        /* Stats Cards for Home */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); display: flex; flex-direction: column; gap: 10px; transition: var(--transition-smooth);}
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+        .stat-card h4 { color: var(--text-light); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+        .stat-card .number { font-size: 36px; font-weight: 700; color: var(--accent-purple); }
+
+        /* Tables */
+        table { width: 100%; border-collapse: separate; border-spacing: 0 15px; }
+        th { text-align: left; padding: 0 25px 10px 25px; color: var(--text-light); font-weight: 500; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;}
+        tbody tr { background: white; transition: var(--transition-smooth); box-shadow: 0 4px 15px rgba(0,0,0,0.02); opacity: 0; }
+        tbody tr td { padding: 20px 25px; border: none; vertical-align: middle; }
+        tbody tr td:first-child { border-top-left-radius: var(--radius-md); border-bottom-left-radius: var(--radius-md); font-weight: 600; color: var(--text-main); font-size: 16px;}
+        tbody tr td:last-child { border-top-right-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); }
+        tbody tr:hover { transform: translateY(-5px) scale(1.01); box-shadow: var(--shadow-hover); z-index: 2; position: relative;}
+        .author-text { color: var(--text-light); font-size: 14px; }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px; padding: 6px 12px; border-radius: var(--radius-pill); }
+        .status-available { background: rgba(139, 184, 139, 0.15); color: #5B8A5B; }
+        .status-borrowed { background: rgba(226, 123, 123, 0.15); color: #C25A5A; }
+        .location-text { font-size: 13px; color: var(--text-light); display: flex; align-items: center; gap: 5px;}
+
+    </style>
+</head>
+<body>
+
+    <div id="login-page" class="fade-transition">
+        <div class="login-card">
+            <h2>Welcome Back</h2>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" value="user@library.com" id="email" placeholder="name@school.edu">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" value="password123" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+                <label>Account Role</label>
+                <select id="role">
+                    <option value="student">Student Account</option>
+                    <option value="admin">Administrator</option>
+                </select>
+            </div>
+            <button type="button" class="btn btn-gradient" onclick="login()">Sign In →</button>
+        </div>
+    </div>
+
+    <div id="dashboard-page" class="fade-transition">
+        <div class="app-body">
+            
+            <div class="sidebar">
+                <div class="sidebar-icon" title="Home" onclick="switchView('view-home', this)">🏠</div>
+                <div class="sidebar-icon active" title="Books" onclick="switchView('view-books', this)">📚</div>
+                <div class="sidebar-icon" title="Saved" onclick="switchView('view-saved', this)">❤️</div>
+                <div class="sidebar-icon" title="History" onclick="switchView('view-history', this)">🕒</div>
+                <div class="sidebar-icon logout" title="Logout" onclick="logout()">🚪</div>
+            </div>
+            
+            <div class="main-content">
+                <div class="header-top">
+                    <div class="search-container">
+                        <span style="color: var(--text-light); font-size: 18px;">🔍</span>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search for books, authors..." onkeyup="filterBooks()">
+                        <button class="search-btn">Search</button>
+                    </div>
+                    
+                    <div class="header-actions">
+                        <button type="button" class="btn btn-action-primary" id="add-book-btn" onclick="addNewBook()">+ Add New Book</button>
+                        <div class="user-profile">
+                            <span style="color: var(--text-light);" id="user-greeting">Hello, User</span>
+                            <div class="avatar" id="user-avatar">U</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-home" class="view-section hidden">
+                    <div class="section-header">
+                        <h3 class="section-title">Dashboard Overview</h3>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h4>Total Books</h4>
+                            <div class="number" id="stat-total">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Active Borrows</h4>
+                            <div class="number" id="stat-borrows" style="color: var(--accent-green);">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Overdue</h4>
+                            <div class="number" id="stat-overdue" style="color: var(--accent-red);">0</div>
+                        </div>
+                    </div>
+                    <div class="empty-state">
+                        <h2>Welcome to the Library Portal</h2>
+                        <p>Use the sidebar on the left to browse the catalog, view your saved books, or check your borrowing history.</p>
+                    </div>
+                </div>
+
+                <div id="view-books" class="view-section">
+                    <div class="section-header">
+                        <h3 class="section-title">Catalog Management</h3>
+                    </div>
+                    <table id="booksTable">
+                        <thead>
+                            <tr class="section-header">
+                                <th>Book Title</th>
+                                <th>Author</th>
+                                <th>Status</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="booksBody">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div id="view-saved" class="view-section hidden">
+                    <div class="section-header">
+                        <h3 class="section-title">Saved For Later</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr class="section-header">
+                                <th>Book Title</th>
+                                <th>Author</th>
+                                <th>Status</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="savedBody">
+                            <tr><td colspan="5">
+                                <div class="empty-state">
+                                    <h2>❤️ No Saved Books Yet</h2>
+                                    <p>Books you mark as favorites will appear here so you can easily find them later.</p>
+                                </div>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="view-history" class="view-section hidden">
+                    <div class="section-header">
+                        <h3 class="section-title">Borrowing History</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr class="section-header">
+                                <th>Action Taken</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr><td colspan="2">
+                                <div class="empty-state">
+                                    <h2>🕒 Clean Record</h2>
+                                    <p>You haven't borrowed any books recently. Once you check out a book, it will be logged here.</p>
+                                </div>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRole = 'student';
+
+        let books = [];
+
+        async function fetchBooks() {
+            try {
+                const response = await fetch('/api/books');
+                books = await response.json();
+                
+                // Update Dashboard Statistics
+                const totalBooks = books.length;
+                const activeBorrows = books.filter(b => !b.available).length;
+                document.getElementById('stat-total').innerText = totalBooks;
+                document.getElementById('stat-borrows').innerText = activeBorrows;
+
+                const booksIcon = document.querySelector('.sidebar-icon[title="Books"]');
+                if(booksIcon && booksIcon.classList.contains('active')) {
+                    renderUpdatedTable(books, 'booksBody');
+                }
+                const savedIcon = document.querySelector('.sidebar-icon[title="Saved"]');
+                if(savedIcon && savedIcon.classList.contains('active')) {
+                    renderSavedTable();
+                }
+            } catch (error) {
+                console.error("Error fetching books:", error);
+            }
+        }
+
+        // --- NEW: View Switching Logic ---
+        function switchView(targetViewId, clickedElement) {
+            // 1. Update Sidebar Active State
+            const icons = document.querySelectorAll('.sidebar-icon:not(.logout)');
+            icons.forEach(icon => icon.classList.remove('active'));
+            clickedElement.classList.add('active');
+
+            // 2. Hide all views
+            const views = document.querySelectorAll('.view-section');
+            views.forEach(view => {
+                view.style.opacity = '0'; // Fade out
+                setTimeout(() => {
+                    view.classList.add('hidden'); // Remove from flow after fade
+                }, 300); // Matches CSS transition time
+            });
+
+            // 3. Show target view
+            setTimeout(() => {
+                const targetView = document.getElementById(targetViewId);
+                targetView.classList.remove('hidden');
+                
+                // Allow display:block to apply before fading in
+                setTimeout(() => {
+                    targetView.style.opacity = '1';
+                    
+                    // Re-trigger entrance animations for the specific view
+                    const headers = targetView.querySelectorAll('.section-header');
+                    headers.forEach(h => {
+                        h.style.animation = 'none';
+                        h.offsetHeight; // trigger reflow
+                        h.style.animation = `fadeSlideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards`;
+                    });
+
+                    // Re-render data fetching tables
+                    if (targetViewId === 'view-books') {
+                        renderUpdatedTable(books, 'booksBody');
+                    } else if (targetViewId === 'view-saved') {
+                        renderSavedTable();
+                    } else if (targetViewId === 'view-history') {
+                        fetchHistory();
+                    }
+                }, 50);
+            }, 300);
+        }
+
+        function login() {
+            currentRole = document.getElementById('role').value;
+            
+            const greeting = document.getElementById('user-greeting');
+            const avatar = document.getElementById('user-avatar');
+            const addBookBtn = document.getElementById('add-book-btn');
+            
+            if (currentRole === 'admin') {
+                greeting.innerText = 'Hello, Admin';
+                avatar.innerText = 'A';
+                avatar.style.background = 'var(--accent-red)'; 
+                addBookBtn.style.display = 'block'; 
+            } else {
+                greeting.innerText = 'Hello, Student';
+                avatar.innerText = 'S';
+                avatar.style.background = 'var(--accent-purple)';
+                addBookBtn.style.display = 'none'; 
+            }
+
+            const loginPage = document.getElementById('login-page');
+            const dashboardPage = document.getElementById('dashboard-page');
+
+            loginPage.style.opacity = '0';
+            loginPage.style.transform = 'scale(1.05)'; 
+            
+            setTimeout(() => {
+                loginPage.classList.add('hidden');
+                dashboardPage.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    dashboardPage.style.pointerEvents = 'auto';
+                    dashboardPage.style.opacity = '1';
+                    dashboardPage.style.transform = 'translateY(0) scale(1)';
+                    
+                    triggerEntranceAnimations();
+                    fetchBooks().then(() => renderTable(books));
+                }, 50);
+            }, 600); 
+        }
+
+        function triggerEntranceAnimations() {
+            const icons = document.querySelectorAll('.sidebar-icon');
+            icons.forEach((icon, index) => {
+                icon.style.animation = `scaleFadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards`;
+                icon.style.animationDelay = `${0.2 + (index * 0.1)}s`;
+            });
+
+            const headers = document.querySelectorAll('.header-top, #view-books .section-header');
+            headers.forEach((header, index) => {
+                header.style.animation = `fadeSlideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards`;
+                header.style.animationDelay = `${0.4 + (index * 0.15)}s`;
+            });
+        }
+
+        function logout() {
+            const loginPage = document.getElementById('login-page');
+            const dashboardPage = document.getElementById('dashboard-page');
+            const animatedElements = document.querySelectorAll('.sidebar-icon, .header-top, .section-header');
+
+            animatedElements.forEach(el => { el.style.animation = 'none'; el.style.opacity = '0'; });
+            document.getElementById('booksBody').innerHTML = '';
+
+            dashboardPage.style.opacity = '0';
+            dashboardPage.style.transform = 'translateY(40px) scale(0.97)';
+            dashboardPage.style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+                dashboardPage.classList.add('hidden');
+                loginPage.classList.remove('hidden');
+                loginPage.style.transform = 'scale(0.95)'; 
+                
+                // Reset to Books view on logout
+                const defaultTab = document.querySelector('.sidebar-icon[title="Books"]');
+                switchView('view-books', defaultTab);
+
+                setTimeout(() => {
+                    loginPage.style.opacity = '1';
+                    loginPage.style.transform = 'scale(1)'; 
+                }, 50);
+            }, 600);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('booksBody');
+            tbody.innerHTML = '';
+            
+            data.forEach((book, index) => {
+                const statusHtml = book.available 
+                    ? `<span class="status-badge status-available">● Available</span>` 
+                    : `<span class="status-badge status-borrowed">● Borrowed</span>`;
+                
+                const locationHtml = book.available 
+                    ? `<span class="location-text">📍 ${book.location}</span>` 
+                    : `<span class="location-text">👤 With User</span>`;
+
+                let btnHtml = '';
+                if (currentRole === 'admin') {
+                    const toggleLabel = book.available ? 'Mark Borrowed' : 'Mark Returned';
+                    btnHtml = `
+                        <div class="action-group">
+                            <button type="button" class="btn btn-action-secondary" onclick="toggleStatus(${book.id})">${toggleLabel}</button>
+                            <button type="button" class="btn btn-action-danger" onclick="deleteBook(${book.id})">Delete</button>
+                        </div>
+                    `;
+                } else {
+                    btnHtml = book.available 
+                        ? `<button type="button" class="btn btn-action-primary" onclick="borrowBook(${book.id})">Borrow Now</button>` 
+                        : `<button type="button" class="btn btn-action-secondary">Notify Me</button>`;
+                }
+
+                const row = `<tr style="animation: fadeSlideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; animation-delay: ${0.5 + (index * 0.1)}s">
+                    <td>${book.title}</td>
+                    <td class="author-text">${book.author}</td>
+                    <td>${statusHtml}</td>
+                    <td>${locationHtml}</td>
+                    <td>${btnHtml}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        async function borrowBook(id) {
+            if (confirm("Are you sure you want to borrow this book?")) {
+                try {
+                    await fetch(`/api/books/${id}/borrow`, { method: 'PUT' });
+                    await fetchBooks();
+                    setTimeout(() => alert("Success! You have reserved the book."), 150);
+                } catch (error) {
+                    console.error("Error borrowing book:", error);
+                }
+            }
+        }
+
+        function toggleSave(id) {
+            let saved = JSON.parse(localStorage.getItem('saved_books') || '[]');
+            if (saved.includes(id)) {
+                saved = saved.filter(savedId => savedId !== id);
+            } else {
+                saved.push(id);
+            }
+            localStorage.setItem('saved_books', JSON.stringify(saved));
+            fetchBooks(); // Re-render tables
+        }
+
+        async function fetchHistory() {
+            try {
+                const response = await fetch('/api/history');
+                const historyData = await response.json();
+                const tbody = document.getElementById('historyBody');
+                tbody.innerHTML = '';
+                if(historyData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="2"><div class="empty-state"><h2>🕒 Clean Record</h2><p>No history yet.</p></div></td></tr>';
+                    return;
+                }
+                historyData.forEach((entry, index) => {
+                    const d = new Date(entry.timestamp + "Z"); // Add Z to specify UTC originally and convert properly
+                    tbody.innerHTML += `<tr style="animation: fadeSlideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; animation-delay: ${index * 0.05}s">
+                        <td style="font-weight:600;">${entry.action}</td>
+                        <td class="author-text">${d.toLocaleString()}</td>
+                    </tr>`;
+                });
+            } catch (error) {
+                console.error("Error fetching history:", error);
+            }
+        }
+
+        async function toggleStatus(id) {
+            try {
+                await fetch(`/api/books/${id}/toggle`, { method: 'PUT' });
+                await fetchBooks();
+            } catch (error) {
+                console.error("Error toggling status:", error);
+            }
+        }
+
+        async function deleteBook(id) {
+            if (confirm("Are you sure you want to permanently delete this book?")) {
+                try {
+                    await fetch(`/api/books/${id}`, { method: 'DELETE' });
+                    await fetchBooks();
+                } catch (error) {
+                    console.error("Error deleting book:", error);
+                }
+            }
+        }
+
+        async function addNewBook() {
+            const title = prompt("Enter Book Title:");
+            if (!title) return;
+            const author = prompt("Enter Author Name:");
+            if (!author) return;
+            const location = prompt("Enter Location (e.g., Shelf A1):", "Unassigned");
+            
+            try {
+                await fetch('/api/books', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, author, location })
+                });
+                await fetchBooks();
+            } catch (error) {
+                console.error("Error adding book:", error);
+                alert("Failed to add book.");
+            }
+        }
+
+        function renderSavedTable() {
+            const savedIds = JSON.parse(localStorage.getItem('saved_books') || '[]');
+            const savedBooks = books.filter(b => savedIds.includes(b.id));
+            if (savedBooks.length === 0) {
+                document.getElementById('savedBody').innerHTML = '<tr><td colspan="5"><div class="empty-state"><h2>❤️ No Saved Books Yet</h2><p>Books you mark as favorites will appear here so you can easily find them later.</p></div></td></tr>';
+                return;
+            }
+            renderUpdatedTable(savedBooks, 'savedBody');
+        }
+
+        function renderUpdatedTable(data, tbodyId = 'booksBody') {
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            
+            const savedIds = JSON.parse(localStorage.getItem('saved_books') || '[]');
+            
+            data.forEach((book, index) => {
+                const statusHtml = book.available 
+                    ? `<span class="status-badge status-available">● Available</span>` : `<span class="status-badge status-borrowed">● Borrowed</span>`;
+                const locationHtml = book.available 
+                    ? `<span class="location-text">📍 ${book.location}</span>` : `<span class="location-text">👤 With User</span>`;
+                
+                const isSaved = savedIds.includes(book.id);
+                const saveIcon = isSaved ? '❤️' : '🤍';
+                
+                let btnHtml = '';
+                if (currentRole === 'admin') {
+                    const toggleLabel = book.available ? 'Mark Borrowed' : 'Mark Returned';
+                    btnHtml = `
+                        <div class="action-group">
+                            <button type="button" class="btn btn-action-secondary" onclick="toggleStatus(${book.id})">${toggleLabel}</button>
+                            <button type="button" class="btn btn-action-danger" onclick="deleteBook(${book.id})">Delete</button>
+                        </div>`;
+                } else {
+                    const primaryAction = book.available 
+                        ? `<button type="button" class="btn btn-action-primary" onclick="borrowBook(${book.id})">Borrow Now</button>` : `<button type="button" class="btn btn-action-secondary">Notify Me</button>`;
+                    
+                    btnHtml = `
+                        <div class="action-group">
+                            ${primaryAction}
+                            <button type="button" class="btn btn-action-secondary" style="font-size: 14px;" onclick="toggleSave(${book.id})" title="Save for later">${saveIcon}</button>
+                        </div>`;
+                }
+
+                const row = `<tr style="animation: fadeSlideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; animation-delay: ${index * 0.05}s">
+                    <td>${book.title}</td>
+                    <td class="author-text">${book.author}</td>
+                    <td>${statusHtml}</td>
+                    <td>${locationHtml}</td>
+                    <td>${btnHtml}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function filterBooks() {
+            // Ensure we are on the books view when searching
+            const booksIcon = document.querySelector('.sidebar-icon[title="Books"]');
+            if(!booksIcon.classList.contains('active')) {
+                switchView('view-books', booksIcon);
+            }
+
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = books.filter(book => 
+                book.title.toLowerCase().includes(query) || 
+                book.author.toLowerCase().includes(query)
+            );
+            
+            // Short delay to allow view switch if needed
+            setTimeout(() => {
+                const savedIcon = document.querySelector('.sidebar-icon[title="Saved"]');
+                if(savedIcon && savedIcon.classList.contains('active')) {
+                     const savedIds = JSON.parse(localStorage.getItem('saved_books') || '[]');
+                     renderUpdatedTable(filtered.filter(b => savedIds.includes(b.id)), 'savedBody');
+                } else {
+                     renderUpdatedTable(filtered, 'booksBody');
+                }
+            }, 50);
+        }
+    </script>
+</body>
+</html>
